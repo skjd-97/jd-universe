@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JD | MY UNIVERSE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --neon-red: #ff003c;
+            --neon-red-glow: rgba(255, 0, 60, 0.6);
+            --bg-color: #050505;
+        }
+
+        * {
+            cursor: none !important; /* Hide default cursor */
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            background-image: 
+                linear-gradient(rgba(255, 0, 60, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 60, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* ---------------------------------
+           CUSTOM MAIN CURSOR
+        --------------------------------- */
+        #main-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-red);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            box-shadow: 0 0 10px var(--neon-red), inset 0 0 5px var(--neon-red);
+            mix-blend-mode: screen;
+        }
+
+        #main-cursor.hovered {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 0, 60, 0.2);
+            border-color: #fff;
+            box-shadow: 0 0 20px #fff;
+        }
+
+        #main-cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 6px;
+            background-color: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 10001;
+            box-shadow: 0 0 10px #fff, 0 0 20px var(--neon-red);
+        }
+
+        /* ---------------------------------
+           SWARM CURSORS (The "so many cursors" effect)
+        --------------------------------- */
+        .swarm-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 18px;
+            height: 18px;
+            pointer-events: none;
+            z-index: 9999;
+            /* Exact classic cursor shape matching the video */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff003c' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round' d='M4.5 3L18.5 11.5L11 13.5L8.5 21.5L4.5 3Z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: contain;
+            filter: drop-shadow(0 0 5px rgba(255, 0, 60, 0.8));
+            opacity: 0.8;
+            will-change: transform;
+        }
+
+        /* ---------------------------------
+           RIPPLE EFFECT
+        --------------------------------- */
+        .ripple {
+            position: fixed;
+            border-radius: 50%;
+            border: 2px solid var(--neon-red);
+            pointer-events: none;
+            animation: rippleAnim 0.6s linear forwards;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes rippleAnim {
+            0% { width: 0; height: 0; opacity: 1; border-width: 4px; }
+            100% { width: 150px; height: 150px; opacity: 0; border-width: 1px; }
+        }
+
+        /* ---------------------------------
+           CANVAS FOR TRAILS & PARTICLES
+        --------------------------------- */
+        #effects-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1; /* Behind content */
+        }
+
+        /* ---------------------------------
+           UI STYLING (Hacker Profile)
+        --------------------------------- */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .hacker-card {
+            background: rgba(10, 0, 0, 0.8);
+            border: 1px solid var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3), inset 0 0 20px rgba(255, 0, 60, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 2.5rem;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanline effect */
+        .hacker-card::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(255, 0, 60, 0.05) 51%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 11;
+        }
+
+        .neon-text {
+            color: #fff;
+            text-shadow: 0 0 5px #fff, 0 0 10px var(--neon-red), 0 0 20px var(--neon-red);
+        }
+        
+        .neon-subtext {
+            color: var(--neon-red);
+            text-shadow: 0 0 5px var(--neon-red);
+        }
+
+        .glitch-btn {
+            position: relative;
+            display: inline-block;
+            padding: 10px 20px;
+            color: #fff;
+            border: 1px solid var(--neon-red);
+            background: transparent;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .glitch-btn:hover {
+            background: var(--neon-red);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-red);
+        }
+
+        .tag {
+            border: 1px solid rgba(255, 0, 60, 0.5);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #ddd;
+            background: rgba(255, 0, 60, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .tag:hover {
+            background: rgba(255, 0, 60, 0.4);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 8px var(--neon-red);
+            transform: translateY(-2px);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Canvas for smooth trailing light and particles -->
+    <canvas id="effects-canvas"></canvas>
+
+    <!-- Main Custom Cursor Elements -->
+    <div id="main-cursor"></div>
+    <div id="main-cursor-dot"></div>
+
+    <!-- Container for Swarm Cursors -->
+    <div id="swarm-container"></div>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <div class="hacker-card interactive">
+            <div class="text-center mb-6">
+                <h2 class="text-sm tracking-[0.3em] text-gray-400 mb-2">SYSTEM.INITIALIZED</h2>
+                <h1 class="text-4xl md:text-5xl font-bold neon-text mb-2">JD | MY UNIVERSE</h1>
+                <div class="h-0.5 w-full bg-gradient-to-r from-transparent via-red-600 to-transparent my-4 opacity-70"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <p class="text-gray-400 text-sm">USER_PROFILE</p>
+                    <p class="text-xl font-bold mt-1">Shaikh Javeed <span class="neon-subtext text-sm">(@JD)</span></p>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-sm">CURRENT_DIRECTIVE</p>
+                    <p class="text-lg mt-1 text-gray-200">Student & Developer</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-sm">LOCATION</p>
+                    <p class="text-lg mt-1 text-gray-200"><i class="fas fa-map-marker-alt text-red-500 mr-2"></i>Udgir</p>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <p class="text-gray-400 text-sm mb-3">> EXECUTE: display_skills()</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="tag interactive">Coding</span>
+                    <span class="tag interactive">Android Development</span>
+                    <span class="tag interactive">Web Development</span>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <p class="text-gray-400 text-sm mb-3">> EXECUTE: list_interests()</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="tag interactive">Technology</span>
+                    <span class="tag interactive">Artificial Intelligence</span>
+                    <span class="tag interactive">Music</span>
+                </div>
+            </div>
+
+            <div class="flex gap-4 justify-center mt-8 pt-6 border-t border-red-900 border-opacity-50">
+                <a href="https://github.com/yourusername" target="_blank" class="glitch-btn interactive">
+                    <i class="fab fa-github mr-2"></i> GitHub
+                </a>
+                <a href="https://instagram.com/yourusername" target="_blank" class="glitch-btn interactive">
+                    <i class="fab fa-instagram mr-2"></i> Instagram
+                </a>
+            </div>
+            
+            <!-- Blinking cursor at the bottom -->
+            <div class="mt-6 text-sm text-red-500 animate-pulse">
+                root@jd-universe:~# _
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for all cursor effects, swarm, canvas trails, and ripples -->
+    <script>
+        const cursor = document.getElementById('main-cursor');
+        const cursorDot = document.getElementById('main-cursor-dot');
+        const canvas = document.getElementById('effects-canvas');
+        const ctx = canvas.getContext('2d');
+        const swarmContainer = document.getElementById('swarm-container');
+
+        let width, height;
+        let mouse = { x: -100, y: -100 }; // Start offscreen
+        let smoothMouse = { x: -100, y: -100 };
+
+        // Config for effects
+        const TRAIL_LENGTH = 20;
+        const trailCoords = [];
+        const particles = [];
+        
+        // Swarm configuration
+        const numSwarm = 30; // Increased for a denser swarm effect like the video
+        const swarmData = [];
+
+        // Resize Canvas
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Initialize Swarm DOM elements
+        for(let i = 0; i < numSwarm; i++) {
+            const el = document.createElement('div');
+            el.classList.add('swarm-cursor');
+            
+            // Add slight opacity variations for depth
+            el.style.opacity = Math.random() * 0.6 + 0.4;
+            
+            swarmContainer.appendChild(el);
+            
+            // Organic Spring Physics parameters for each swarm cursor
+            swarmData.push({
+                element: el,
+                x: window.innerWidth / 2,
+                y: window.innerHeight / 2,
+                vx: 0,
+                vy: 0,
+                // Spring physics for smooth trailing and flocking
+                spring: 0.01 + (Math.random() * 0.04),
+                friction: 0.70 + (Math.random() * 0.20),
+                // Cluster offsets
+                offsetX: (Math.random() * 140) - 70,
+                offsetY: (Math.random() * 140) - 70,
+            });
+        }
+
+        // Mouse Move Event
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            // Move DOM Custom Cursor
+            cursor.style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
+            cursorDot.style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
+
+            // Add point for trail
+            trailCoords.push({ x: mouse.x, y: mouse.y });
+            if (trailCoords.length > TRAIL_LENGTH) {
+                trailCoords.shift();
+            }
+
+            // Create particles on move
+            if (Math.random() > 0.4) {
+                particles.push(new Particle(mouse.x, mouse.y));
+            }
+        });
+
+        // Hover Effect on Interactive Elements
+        const interactives = document.querySelectorAll('.interactive, a, button, .tag');
+        interactives.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        // Click Ripple Effect
+        window.addEventListener('click', (e) => {
+            const ripple = document.createElement('div');
+            ripple.classList.add('ripple');
+            ripple.style.left = `${e.clientX}px`;
+            ripple.style.top = `${e.clientY}px`;
+            document.body.appendChild(ripple);
+
+            // Create explosion particles
+            for(let i=0; i<15; i++) {
+                particles.push(new Particle(e.clientX, e.clientY, true));
+            }
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+
+        // Particle Class
+        class Particle {
+            constructor(x, y, isExplosion = false) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 2 + 1;
+                
+                if (isExplosion) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 5 + 2;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+                    this.life = 1;
+                    this.decay = Math.random() * 0.03 + 0.02;
+                } else {
+                    this.vx = (Math.random() - 0.5) * 2;
+                    this.vy = (Math.random() - 0.5) * 2 + 1; // Fall slightly down
+                    this.life = 1;
+                    this.decay = Math.random() * 0.02 + 0.01;
+                }
+                this.color = `rgba(255, 0, 60, ${this.life})`;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+                this.color = `rgba(255, 0, 60, ${this.life})`;
+            }
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        // Main Animation Loop
+        function animate() {
+            // Clear Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Light Trail (Canvas)
+            if (trailCoords.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(trailCoords[0].x, trailCoords[0].y);
+                for (let i = 1; i < trailCoords.length; i++) {
+                    // Smooth curve
+                    const xc = (trailCoords[i].x + trailCoords[i-1].x) / 2;
+                    const yc = (trailCoords[i].y + trailCoords[i-1].y) / 2;
+                    ctx.quadraticCurveTo(trailCoords[i-1].x, trailCoords[i-1].y, xc, yc);
+                }
+                ctx.lineTo(trailCoords[trailCoords.length-1].x, trailCoords[trailCoords.length-1].y);
+                
+                // Trail styling
+                ctx.strokeStyle = 'rgba(255, 0, 60, 0.4)';
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ff003c';
+                ctx.stroke();
+                ctx.shadowBlur = 0; // Reset shadow for next drawings
+                
+                // Shrink trail slowly if mouse stops
+                trailCoords.shift();
+            }
+
+            // 2. Update & Draw Particles (Canvas)
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                } else {
+                    particles[i].draw(ctx);
+                }
+            }
+
+            // 3. Update Swarm Cursors (DOM) - "So many cursors" effect
+            // Using Spring Physics for organic flocking/swarming like the video
+            
+            // Dynamic mouse offset that shifts slowly over time to make the swarm "breathe"
+            const time = Date.now() * 0.002;
+
+            swarmData.forEach((s, index) => {
+                // Breathing offset (orbiting effect)
+                let currentOffsetX = s.offsetX + Math.cos(time + index) * 30;
+                let currentOffsetY = s.offsetY + Math.sin(time + index) * 30;
+
+                // Calculate target position for this specific swarm cursor
+                let targetX = mouse.x + currentOffsetX;
+                let targetY = mouse.y + currentOffsetY;
+
+                // Spring physics calculations
+                let dx = targetX - s.x;
+                let dy = targetY - s.y;
+                
+                s.vx += dx * s.spring;
+                s.vy += dy * s.spring;
+                
+                // Apply friction
+                s.vx *= s.friction;
+                s.vy *= s.friction;
+                
+                s.x += s.vx;
+                s.y += s.vy;
+
+                // Apply transform
+                s.element.style.transform = `translate(${s.x}px, ${s.y}px)`;
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation loop
+        animate();
+
+    </script>
+</body>
+</html>
