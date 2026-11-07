@@ -321,10 +321,10 @@
             });
         }
 
-        // Mouse Move Event
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
+        // Handle Move for both Mouse and Finger
+        function updateCursorAndTrail(x, y) {
+            mouse.x = x;
+            mouse.y = y;
 
             // Move DOM Custom Cursor
             cursorDot.style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
@@ -339,7 +339,25 @@
             if (Math.random() > 0.4) {
                 particles.push(new Particle(mouse.x, mouse.y));
             }
+        }
+
+        // Mouse Move Event (Desktop)
+        window.addEventListener('mousemove', (e) => {
+            updateCursorAndTrail(e.clientX, e.clientY);
         });
+
+        // Touch Events (Mobile Finger Tracking)
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                updateCursorAndTrail(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                updateCursorAndTrail(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
 
         // Hover Effect on Interactive Elements
         const interactives = document.querySelectorAll('.interactive, a, button, .tag');
