@@ -36,30 +36,6 @@
         /* ---------------------------------
            CUSTOM MAIN CURSOR
         --------------------------------- */
-        #main-cursor {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--neon-red);
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 10000;
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
-            box-shadow: 0 0 10px var(--neon-red), inset 0 0 5px var(--neon-red);
-            mix-blend-mode: screen;
-        }
-
-        #main-cursor.hovered {
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255, 0, 60, 0.2);
-            border-color: #fff;
-            box-shadow: 0 0 20px #fff;
-        }
-
         #main-cursor-dot {
             position: fixed;
             top: 0;
@@ -72,6 +48,14 @@
             transform: translate(-50%, -50%);
             z-index: 10001;
             box-shadow: 0 0 10px #fff, 0 0 20px var(--neon-red);
+            transition: width 0.2s, height 0.2s, background-color 0.2s, box-shadow 0.2s;
+        }
+
+        #main-cursor-dot.hovered {
+            width: 12px;
+            height: 12px;
+            background-color: var(--neon-red);
+            box-shadow: 0 0 15px var(--neon-red), 0 0 30px #fff;
         }
 
         /* ---------------------------------
@@ -218,7 +202,6 @@
     <canvas id="effects-canvas"></canvas>
 
     <!-- Main Custom Cursor Elements -->
-    <div id="main-cursor"></div>
     <div id="main-cursor-dot"></div>
 
     <!-- Container for Swarm Cursors -->
@@ -284,7 +267,6 @@
 
     <!-- Script for all cursor effects, swarm, canvas trails, and ripples -->
     <script>
-        const cursor = document.getElementById('main-cursor');
         const cursorDot = document.getElementById('main-cursor-dot');
         const canvas = document.getElementById('effects-canvas');
         const ctx = canvas.getContext('2d');
@@ -345,7 +327,6 @@
             mouse.y = e.clientY;
 
             // Move DOM Custom Cursor
-            cursor.style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
             cursorDot.style.transform = `translate(${mouse.x}px, ${mouse.y}px)`;
 
             // Add point for trail
@@ -363,8 +344,8 @@
         // Hover Effect on Interactive Elements
         const interactives = document.querySelectorAll('.interactive, a, button, .tag');
         interactives.forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+            el.addEventListener('mouseenter', () => cursorDot.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursorDot.classList.remove('hovered'));
         });
 
         // Click Ripple Effect
